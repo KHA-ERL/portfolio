@@ -48,4 +48,5 @@ next-env.d.ts
 
 # AI / Agent specific files
 AGENTS.md
+Claude.md
 .gemini/
