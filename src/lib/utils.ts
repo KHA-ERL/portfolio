@@ -16,9 +16,31 @@ export function formatDate(dateString: string): string {
   })
 }
 
-export function estimateReadingTime(body: unknown[]): number {
-  const text = JSON.stringify(body)
-  const wordCount = text.split(/\s+/).length
+function getPortableTextContent(value: unknown): string {
+  if (!value) return ''
+
+  if (typeof value === 'string') return value
+
+  if (Array.isArray(value)) {
+    return value.map(getPortableTextContent).filter(Boolean).join(' ')
+  }
+
+  if (typeof value !== 'object') return ''
+
+  const record = value as Record<string, unknown>
+  const chunks: string[] = []
+
+  if (typeof record.text === 'string') chunks.push(record.text)
+  if (typeof record.code === 'string') chunks.push(record.code)
+  if (record.children) chunks.push(getPortableTextContent(record.children))
+
+  return chunks.join(' ')
+}
+
+export function estimateReadingTime(body: unknown[] | string | null | undefined): number {
+  const text = getPortableTextContent(body).trim()
+  const wordCount = text ? text.split(/\s+/).length : 0
+
   return Math.max(1, Math.ceil(wordCount / 200))
 }
 

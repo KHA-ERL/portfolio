@@ -1,29 +1,54 @@
 import { groq } from 'next-sanity'
 import { client } from './sanity.client'
+import { estimateReadingTime } from './utils'
 import type { Post, Bookmark, AboutPage, Project } from '@/types'
 
 // ── Blog Posts ──────────────────────────────────────────────────────────────
 
+const publishedPostFilter = groq`
+  _type == "post" &&
+  !(_id in path("drafts.**")) &&
+  defined(slug.current) &&
+  defined(publishedAt) &&
+  dateTime(publishedAt) <= dateTime(now())
+`
+
+type PostWithReadingText = Post & {
+  readingText?: string
+}
+
+function withEstimatedReadingTime<T extends PostWithReadingText>(post: T): Post {
+  const { readingText, ...publishedPost } = post
+
+  return {
+    ...publishedPost,
+    estimatedReadingTime: estimateReadingTime(readingText ?? publishedPost.body),
+  }
+}
+
 export const postsQuery = groq`
-  *[_type == "post"] | order(publishedAt desc) {
-    _id, title, slug, publishedAt, excerpt, coverImage, tags
+  *[${publishedPostFilter}] | order(publishedAt desc) {
+    _id, _type, title, slug, publishedAt, excerpt, coverImage, tags,
+    "readingText": pt::text(body)
   }
 `
 
 export const postBySlugQuery = groq`
-  *[_type == "post" && slug.current == $slug][0] {
-    _id, title, slug, publishedAt, excerpt, coverImage, tags, body
+  *[${publishedPostFilter} && slug.current == $slug][0] {
+    _id, _type, title, slug, publishedAt, excerpt, coverImage, tags, body,
+    "readingText": pt::text(body)
   }
 `
 
 export const latestPostsQuery = groq`
-  *[_type == "post"] | order(publishedAt desc)[0...3] {
-    _id, title, slug, publishedAt, excerpt, coverImage, tags
+  *[${publishedPostFilter}] | order(publishedAt desc)[0...3] {
+    _id, _type, title, slug, publishedAt, excerpt, coverImage, tags,
+    "readingText": pt::text(body)
   }
 `
 
 export const allSlugsQuery = groq`
-  *[_type == "post"] { "slug": slug.current }
+  *[${publishedPostFilter}] { "slug": slug.current }
 `
 
 // ── Projects ────────────────────────────────────────────────────────────────
@@ -65,15 +90,21 @@ export const aboutQuery = groq`
 // ── Fetchers ─────────────────────────────────────────────────────────────────
 
 export async function getPosts(): Promise<Post[]> {
-  return client.fetch(postsQuery)
+  const posts = await client.fetch<PostWithReadingText[]>(postsQuery)
+
+  return posts.map(withEstimatedReadingTime)
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  return client.fetch(postBySlugQuery, { slug })
+  const post = await client.fetch<PostWithReadingText | null>(postBySlugQuery, { slug })
+
+  return post ? withEstimatedReadingTime(post) : null
 }
 
 export async function getLatestPosts(): Promise<Post[]> {
-  return client.fetch(latestPostsQuery)
+  const posts = await client.fetch<PostWithReadingText[]>(latestPostsQuery)
+
+  return posts.map(withEstimatedReadingTime)
 }
 
 export async function getAllSlugs(): Promise<{ slug: string }[]> {
@@ -93,9 +124,25 @@ export async function getAbout(): Promise<AboutPage | null> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-  return client.fetch(projectsQuery)
+  return client.fetch(
+    projectsQuery,
+    {},
+    {
+      next: {
+        revalidate: 300,
+      },
+    }
+  )
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {
-  return client.fetch(featuredProjectsQuery)
+  return client.fetch(
+    featuredProjectsQuery,
+    {},
+    {
+      next: {
+        revalidate: 300,
+      },
+    }
+  )
 }
