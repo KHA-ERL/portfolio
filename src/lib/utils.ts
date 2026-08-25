@@ -1,6 +1,6 @@
 import { createImageUrlBuilder } from '@sanity/image-url'
 import { client } from './sanity.client'
-import type { SanityImage } from '@/types'
+import type { Project, SanityImage } from '@/types'
 
 const builder = createImageUrlBuilder(client)
 
@@ -23,10 +23,14 @@ export function estimateReadingTime(body: unknown[]): number {
 }
 
 export async function getOgImage(url: string) {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 4000)
+
   try {
     if (!url) return null
 
     const res = await fetch(url, {
+      signal: controller.signal,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
@@ -73,5 +77,81 @@ export async function getOgImage(url: string) {
     return new URL(match[1], url).toString()
   } catch {
     return null
+  } finally {
+    clearTimeout(timeout)
   }
+}
+
+export type ProjectPreview =
+  | {
+      type: 'image'
+      src: string
+    }
+  | {
+      type: 'iframe'
+      src: string
+    }
+  | null
+
+function getGithubOpenGraphImage(url: string): string | null {
+  try {
+    const parsedUrl = new URL(url)
+
+    if (parsedUrl.hostname !== 'github.com' && parsedUrl.hostname !== 'www.github.com') {
+      return null
+    }
+
+    const githubPath = parsedUrl.pathname.replace(/^\/+/, '').replace(/\/+$/, '')
+    if (!githubPath) return null
+
+    return `https://opengraph.githubassets.com/portfolio-preview/${githubPath}`
+  } catch {
+    return null
+  }
+}
+
+async function getUrlPreview(url: string, allowIframe: boolean): Promise<ProjectPreview> {
+  const image = await getOgImage(url)
+
+  if (image) {
+    return {
+      type: 'image',
+      src: image,
+    }
+  }
+
+  const githubImage = getGithubOpenGraphImage(url)
+
+  if (githubImage) {
+    return {
+      type: 'image',
+      src: githubImage,
+    }
+  }
+
+  if (!allowIframe) return null
+
+  return {
+    type: 'iframe',
+    src: url,
+  }
+}
+
+export async function getProjectPreview(project: Project): Promise<ProjectPreview> {
+  if (project.coverImage) {
+    return {
+      type: 'image',
+      src: urlFor(project.coverImage).width(600).height(400).url(),
+    }
+  }
+
+  if (project.liveUrl) {
+    return getUrlPreview(project.liveUrl, true)
+  }
+
+  if (project.githubUrl) {
+    return getUrlPreview(project.githubUrl, true)
+  }
+
+  return null
 }

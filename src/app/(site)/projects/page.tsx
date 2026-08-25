@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
+import ProjectPreview from '@/components/ProjectPreview'
 import { getProjects } from '@/lib/sanity.queries'
-import { urlFor, getOgImage } from '@/lib/utils'
+import { getProjectPreview } from '@/lib/utils'
 import { sampleProjects } from '@/lib/sample-data'
 import type { Project } from '@/types'
 
@@ -21,36 +22,12 @@ export default async function ProjectsPage() {
     // fall back to sample data
   }
 
-  // Pre-fetch OG images server-side for projects without a cover image
-  const ogImages = await Promise.all(
-  projects.map(async (project) => {
-    // 1. Sanity cover image takes priority
-    if (project.coverImage) {
-      return null
-    }
-
-    // 2. Try live website
-    if (project.liveUrl) {
-      const liveImage = await getOgImage(project.liveUrl)
-
-      if (liveImage) {
-        return liveImage
-      }
-    }
-
-    // 3. Try GitHub if live website has no preview
-    if (project.githubUrl) {
-      const githubImage = await getOgImage(project.githubUrl)
-
-      if (githubImage) {
-        return githubImage
-      }
-    }
-
-    // 4. Nothing available
-    return null
-  })
-)
+  const projectsWithPreviews = await Promise.all(
+    projects.map(async (project) => ({
+      ...project,
+      preview: await getProjectPreview(project),
+    }))
+  )
 
   return (
     <main className="max-w-7xl mx-auto px-8 py-20">
@@ -60,33 +37,15 @@ export default async function ProjectsPage() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.length > 0 ? (
-          projects.map((project, i) => {
-            const previewImg = project.coverImage
-              ? urlFor(project.coverImage).width(600).height(400).url()
-              : ogImages[i]
-
-            return (
+        {projectsWithPreviews.length > 0 ? (
+          projectsWithPreviews.map((project) => (
               <div
                 key={project._id}
                 className="flex flex-col rounded-xl border transition-all hover:-translate-y-1 hover:shadow-lg overflow-hidden bg-[var(--tag-bg)]"
                 style={{ borderColor: 'var(--border)' }}
               >
                 <a href={project.liveUrl || project.githubUrl || '#'} target="_blank" rel="noopener noreferrer" className="block group">
-                  <div className="relative h-56 w-full border-b bg-[var(--border)]" style={{ borderColor: 'var(--border)' }}>
-                    {previewImg ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={previewImg}
-                        alt={project.title}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="opacity-50 text-sm">No cover</span>
-                      </div>
-                    )}
-                  </div>
+                  <ProjectPreview alt={project.title} preview={project.preview} />
                 </a>
 
                 <div className="p-6 flex-1 flex flex-col">
@@ -128,8 +87,7 @@ export default async function ProjectsPage() {
                   </div>
                 </div>
               </div>
-            )
-          })
+          ))
         ) : (
           <div className="col-span-full text-center py-16 border border-dashed rounded-xl" style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
             No projects found. Add some in Sanity!

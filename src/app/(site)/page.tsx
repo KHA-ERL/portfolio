@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { formatDate, urlFor, getOgImage } from '@/lib/utils'
+import ProjectPreview from '@/components/ProjectPreview'
+import { formatDate, getProjectPreview } from '@/lib/utils'
 import { getLatestPosts, getFeaturedBookmarks, getFeaturedProjects } from '@/lib/sanity.queries'
 import { samplePosts, sampleBookmarks, sampleProjects } from '@/lib/sample-data'
 import { Project } from '@/types'
@@ -37,27 +38,9 @@ export default async function HomePage() {
 
   const projectsWithPreviews = await Promise.all(
     projects.map(async (project) => {
-      if (project.coverImage) {
-        return {
-          ...project,
-          previewImage: null,
-        }
-      }
-
-      const url = project.liveUrl || project.githubUrl
-
-      if (!url) {
-        return {
-          ...project,
-          previewImage: null,
-        }
-      }
-
-      const previewImage = await getOgImage(url)
-
       return {
         ...project,
-        previewImage,
+        preview: await getProjectPreview(project),
       }
     })
   )
@@ -96,7 +79,7 @@ export default async function HomePage() {
             className="prose leading-relaxed mb-5"
             style={{ color: 'var(--muted)' }}
           >
-            When i'm not writing code, I dedicate myself to strenght, reflex and endurance training through boxing, video gaming and running. I approach sports with the same discipline I bring to engineering.
+            When I&apos;m not writing code, I dedicate myself to strength, reflex and endurance training through boxing, video gaming and running. I approach sports with the same discipline I bring to engineering.
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -260,46 +243,7 @@ export default async function HomePage() {
               style={{ borderColor: 'var(--border)' }}
             >
               <a href={project.liveUrl || project.githubUrl || '#'} target="_blank" rel="noopener noreferrer" className="block group">
-                {project.coverImage ? (
-                  <div
-                    className="relative h-48 w-full border-b"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={urlFor(project.coverImage).width(600).height(400).url()}
-                      alt={project.title}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                ) : project.previewImage ? (
-                  <div
-                    className="relative h-48 w-full border-b"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={project.previewImage}
-                      alt={project.title}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="relative h-48 w-full border-b flex items-center justify-center"
-                    style={{
-                      borderColor: 'var(--border)',
-                      background: 'var(--tag-bg)',
-                    }}
-                  >
-                    <span
-                      className="opacity-50"
-                      style={{ color: 'var(--muted)' }}
-                    >
-                      No cover
-                    </span>
-                  </div>
-                )}
+                <ProjectPreview alt={project.title} preview={project.preview} className="h-48" />
               </a>
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex items-center justify-between mb-2">
