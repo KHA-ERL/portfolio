@@ -1,16 +1,24 @@
 import type { Metadata } from "next"
 
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import BookmarkFolder from "@/components/BookmarkFolder"
 
 import { getBookmarks } from "@/lib/sanity.queries"
 
 import { sampleBookmarks } from "@/lib/sample-data"
+import { absoluteUrl, getJsonLd } from "@/lib/site"
 
 export const metadata: Metadata = {
 
-title:"Bookmarks",
+title:"Engineering Bookmarks",
 
-description:"Bookmark library",
+description:"Curated engineering bookmarks and technical references collected by Michael Paul.",
+
+alternates:{
+
+canonical:"/bookmarks",
+
+},
 
 }
 
@@ -43,10 +51,27 @@ new Set(bookmarks.map(b=>b.topic))
 return(
 
 <main className="max-w-7xl mx-auto px-8 py-20">
+<Breadcrumbs items={[{label:"Bookmarks",href:"/bookmarks"}]} />
+<script
+type="application/ld+json"
+dangerouslySetInnerHTML={{
+__html:getJsonLd({
+"@context":"https://schema.org",
+"@type":"CollectionPage",
+name:"Engineering Bookmarks",
+url:absoluteUrl("/bookmarks"),
+hasPart:topics.map(topic=>({
+"@type":"CollectionPage",
+name:`${topic} Bookmarks`,
+url:absoluteUrl(`/bookmarks/${encodeURIComponent(topic)}`),
+})),
+}),
+}}
+/>
 
 <h1 className="text-5xl font-black mb-5">
 
-Bookmarks
+Engineering Bookmarks
 
 </h1>
 

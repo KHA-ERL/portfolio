@@ -32,7 +32,7 @@ export function Navbar() {
         <Link
           href="/"
           className="flex items-center gap-2 group shrink-0"
-          aria-label="Michael Paul — Home"
+          aria-label="Michael Paul - Home"
         >
           <span
             className="w-8 h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-200 group-hover:scale-105"

@@ -82,7 +82,7 @@ export const sampleProjects: Project[] = [
     slug: { current: 'web-portfolio' },
     description: 'Personal portfolio and blog built with Next.js and Sanity CMS.',
     status: 'in-progress',
-    liveUrl: 'https://michaelpaul.dev',
+    liveUrl: 'https://khaerl.dev',
     githubUrl: 'https://github.com/kha-erl',
     techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Sanity'],
     publishedAt: '2026-08-01T00:00:00Z',

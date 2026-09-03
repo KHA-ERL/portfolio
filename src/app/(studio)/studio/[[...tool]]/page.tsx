@@ -2,8 +2,7 @@
  * Sanity Studio embedded at /studio
  * This is the content management interface for the portfolio.
  *
- * Access it at: http://localhost:3000/studio (dev)
- * or: https://yourdomain.com/studio (production)
+ * Access it at /studio.
  */
 
 // src/app/studio/[[...tool]]/page.tsx

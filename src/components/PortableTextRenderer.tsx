@@ -1,5 +1,3 @@
-'use client'
-
 import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import type { PortableTextBlock, SanityImage } from '@/types'
@@ -18,7 +16,7 @@ const components = {
         <figure className="my-8 relative w-full h-80">
           <Image
             src={src}
-            alt={value.alt ?? 'Blog image'}
+            alt={value.alt ?? 'Article supporting image'}
             fill
             sizes="(max-width: 768px) 100vw, 900px"
             className="rounded-xl object-cover"
@@ -27,7 +25,15 @@ const components = {
       )
     },
 
-    code: CodeBlock,
+    code: ({
+      value,
+    }: {
+      value: {
+        code?: string
+        language?: string
+        filename?: string
+      }
+    }) => <CodeBlock value={value} />,
   },
 
   block: {

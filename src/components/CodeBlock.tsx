@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { codeToHtml } from "shiki";
 
 interface CodeBlockProps {
   value: {
@@ -24,6 +23,7 @@ export default function CodeBlock({ value }: CodeBlockProps) {
 
     async function highlightCode() {
       try {
+        const { codeToHtml } = await import("shiki");
         const html = await codeToHtml(code, {
           lang: language,
           theme: "github-dark",

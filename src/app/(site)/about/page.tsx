@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { getAbout } from '@/lib/sanity.queries'
 import { sampleAbout } from '@/lib/sample-data'
+import { getJsonLd, personJsonLd } from '@/lib/site'
 import type { AboutPage } from '@/types'
 import Image from "next/image";
 import {
@@ -48,8 +50,12 @@ const skillIcons = {
 }
 
 export const metadata: Metadata = {
-  title: 'About',
-  description: 'About Michael Paul — software engineer, writer, systems thinker.',
+  title: 'About Michael Paul',
+  description:
+    'Learn about Michael Paul, a software engineer and technical writer working across backend systems, DevOps, cloud infrastructure, AI products, and media.',
+  alternates: {
+    canonical: '/about',
+  },
 }
 
 const platformIcons: Record<string, React.ReactNode> = {
@@ -156,6 +162,11 @@ export default async function AboutPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: getJsonLd(personJsonLd) }}
+      />
+      <Breadcrumbs items={[{ label: 'About', href: '/about' }]} />
 
       {/* Mobile Image */}
       <div className="flex md:hidden justify-center mb-10">
@@ -346,7 +357,7 @@ export default async function AboutPage() {
         ) : (
           <div className="prose">
             <p className="">
-              When i'm not writing code, I dedicate myself to strenght, reflex and endurance training through boxing, video gaming and running. I approach sports with the same discipline I bring to engineering.
+              When I&apos;m not writing code, I train strength, reflexes, and endurance through boxing, video gaming, and running. I approach sports with the same discipline I bring to engineering.
             </p>
           </div>
         )}

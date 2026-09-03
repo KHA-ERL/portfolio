@@ -2,9 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Amiri, Playfair_Display } from 'next/font/google'
 
 import './globals.css'
-import { ThemeProvider } from '@/components/ThemeProvider'
-import { Navbar } from '@/components/Navbar'
-import { Footer } from '@/components/Footer'
+import { absoluteUrl, siteConfig } from '@/lib/site'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,30 +24,44 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Michael Paul — Software Engineer',
+    default: siteConfig.title,
     template: '%s | Michael Paul',
   },
-  description:
-    'Software engineer writing about backend systems, Linux, and the craft of building great software.',
+  description: siteConfig.description,
   keywords: ['software engineer', 'backend', 'Linux', 'TypeScript', 'Next.js', 'blog'],
   authors: [{ name: 'Michael Paul' }],
+  creator: 'Michael Paul',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
-    locale: 'en_GB',
-    url: 'https://khaerl.dev',
-    siteName: 'Michael Paul',
-    title: 'Michael Paul — Software Engineer',
-    description:
-      'Software engineer writing about backend systems, Linux, and the craft of building great software.',
+    locale: siteConfig.locale,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: absoluteUrl(siteConfig.image),
+        width: 1200,
+        height: 630,
+        alt: 'Michael Paul - Software Engineer',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Michael Paul — Software Engineer',
-    description:
-      'Software engineer writing about backend systems, Linux, and the craft of building great software.',
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [absoluteUrl(siteConfig.image)],
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

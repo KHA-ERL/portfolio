@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PortableTextRenderer } from "@/components/PortableTextRenderer";
+import { absoluteUrl, getJsonLd } from "@/lib/site";
 
 import {
   getPostBySlug,
@@ -42,6 +44,17 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.excerpt,
+    alternates: {
+      canonical: `/blog/${post.slug.current}`,
+    },
+    openGraph: {
+      type: "article",
+      url: absoluteUrl(`/blog/${post.slug.current}`),
+      title: post.title,
+      description: post.excerpt,
+      publishedTime: post.publishedAt,
+      tags: post.tags,
+    },
   };
 }
 
@@ -58,6 +71,36 @@ export default async function BlogPostPage({
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-16">
+      <Breadcrumbs
+        items={[
+          { label: "Blog", href: "/blog" },
+          { label: post.title, href: `/blog/${post.slug.current}` },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: getJsonLd({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: post.publishedAt,
+            dateModified: post.publishedAt,
+            url: absoluteUrl(`/blog/${post.slug.current}`),
+            author: {
+              "@type": "Person",
+              name: "Michael Paul",
+              url: absoluteUrl("/about"),
+            },
+            publisher: {
+              "@type": "Person",
+              name: "Michael Paul",
+              url: absoluteUrl("/about"),
+            },
+          }),
+        }}
+      />
 
       <Link
         href="/blog"

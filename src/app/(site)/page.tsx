@@ -1,15 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProjectPreview from '@/components/ProjectPreview'
+import { getJsonLd, localBusinessJsonLd, personJsonLd, siteConfig } from '@/lib/site'
 import { formatDate, getProjectPreview } from '@/lib/utils'
 import { getLatestPosts, getFeaturedBookmarks, getFeaturedProjects } from '@/lib/sanity.queries'
 import { samplePosts, sampleBookmarks, sampleProjects } from '@/lib/sample-data'
 import { Project } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Michael Paul — Software Engineer',
-  description:
-    'Personal site of Michael Paul — software engineer, writer, and systems thinker.',
+  title: 'Michael Paul - Software Engineer',
+  description: siteConfig.description,
+  alternates: {
+    canonical: '/',
+  },
 }
 
 export default async function HomePage() {
@@ -47,6 +50,14 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: getJsonLd(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: getJsonLd(localBusinessJsonLd) }}
+      />
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="min-h-[60vh] flex flex-col justify-center py-8" aria-labelledby="hero-heading">
@@ -71,7 +82,7 @@ export default async function HomePage() {
             className="leading-relaxed mb-5 prose"
             style={{ color: 'var(--muted)' }}
           >
-            Software engineer obsessed with backend systems, Linux internals, Cloud architecture, Video editing, Technical writing, documenting what i learn and building
+            Software engineer focused on backend systems, Linux internals, cloud architecture, video editing, technical writing, documenting what I learn, and building
             things that last.
           </p>
 
@@ -275,7 +286,7 @@ export default async function HomePage() {
             </div>
           )) : (
             <div className="col-span-full text-center py-12 border border-dashed rounded-xl" style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
-              No projects found. Add some in Sanity!
+              Selected projects will appear here soon.
             </div>
           )}
         </div>

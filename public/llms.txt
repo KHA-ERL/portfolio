@@ -1,0 +1,24 @@
+# Michael Paul
+
+> Software engineer, DevOps engineer, technical writer, and product builder focused on backend systems, cloud infrastructure, Linux, and AI-powered software.
+
+## Primary Pages
+
+- [Home](https://khaerl.dev/)
+- [About Michael Paul](https://khaerl.dev/about)
+- [Software Engineering Projects](https://khaerl.dev/projects)
+- [Software Engineering Blog](https://khaerl.dev/blog)
+- [Engineering Bookmarks](https://khaerl.dev/bookmarks)
+
+## Topics
+
+- Backend systems
+- DevOps and cloud infrastructure
+- Linux and systems engineering
+- TypeScript and Next.js
+- AI-powered product engineering
+- Technical writing
+
+## Source
+
+Canonical site: https://khaerl.dev

@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getPosts } from "@/lib/sanity.queries";
 import { samplePosts } from "@/lib/sample-data";
+import { absoluteUrl, getJsonLd } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Software Engineering Blog",
   description:
     "Writing on backend systems, Linux internals, TypeScript patterns, and software engineering craft.",
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
 const POSTS_PER_PAGE = 30;
@@ -29,8 +34,8 @@ export default async function BlogPage({
     if (sanityPosts?.length) {
       posts = sanityPosts;
     }
-  } catch (error) {
-    console.error("Failed to fetch Sanity posts:", error);
+  } catch {
+    posts = samplePosts;
   }
 
   const params = await searchParams;
@@ -53,13 +58,32 @@ export default async function BlogPage({
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-16">
+      <Breadcrumbs items={[{ label: "Blog", href: "/blog" }]} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: getJsonLd({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            name: "Software Engineering Blog",
+            url: absoluteUrl("/blog"),
+            blogPost: posts.map((post) => ({
+              "@type": "BlogPosting",
+              headline: post.title,
+              description: post.excerpt,
+              datePublished: post.publishedAt,
+              url: absoluteUrl(`/blog/${post.slug.current}`),
+            })),
+          }),
+        }}
+      />
 
       <header className="mb-10">
         <h1
           className="text-4xl sm:text-5xl font-black mb-4"
           style={{ color: "var(--text)" }}
         >
-          Blog
+          Software Engineering Blog
         </h1>
 
         <p

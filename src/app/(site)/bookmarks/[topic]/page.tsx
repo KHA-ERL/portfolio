@@ -1,6 +1,9 @@
+import type { Metadata } from 'next'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { getBookmarks } from '@/lib/sanity.queries'
 import { sampleBookmarks } from '@/lib/sample-data'
 import Link from 'next/link'
+import { absoluteUrl, getJsonLd } from '@/lib/site'
 import { urlFor, getOgImage } from '@/lib/utils'
 
 interface TopicPageProps {
@@ -9,17 +12,54 @@ interface TopicPageProps {
   }>
 }
 
+function getSourceName(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return 'Source'
+  }
+}
+
+function getSourceOrigin(url: string) {
+  try {
+    return new URL(url).origin
+  } catch {
+    return url
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: TopicPageProps): Promise<Metadata> {
+  const { topic } = await params
+  const decodedTopic = decodeURIComponent(topic)
+
+  return {
+    title: `${decodedTopic} Bookmarks`,
+    description: `Curated ${decodedTopic.toLowerCase()} engineering bookmarks and technical sources collected by Michael Paul.`,
+    alternates: {
+      canonical: `/bookmarks/${encodeURIComponent(decodedTopic)}`,
+    },
+  }
+}
+
 export default async function TopicPage({
   params,
 }: TopicPageProps) {
   const { topic } = await params
 
-  const bookmarks = await getBookmarks()
+  let bookmarks = sampleBookmarks
 
-  const data =
-    bookmarks.length > 0
-      ? bookmarks
-      : sampleBookmarks
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      const sanityBookmarks = await getBookmarks()
+      if (sanityBookmarks.length > 0) bookmarks = sanityBookmarks
+    }
+  } catch {
+    bookmarks = sampleBookmarks
+  }
+
+  const data = bookmarks
 
   const decodedTopic = decodeURIComponent(topic)
 
@@ -33,6 +73,13 @@ export default async function TopicPage({
     return (
       <main className="min-h-screen px-6 py-24">
         <div className="mx-auto max-w-4xl">
+          <Breadcrumbs
+            items={[
+              { label: 'Bookmarks', href: '/bookmarks' },
+              { label: 'Topic not found', href: `/bookmarks/${topic}` },
+            ]}
+          />
+
           <Link
             href="/bookmarks"
             className="mb-8 inline-block underline"
@@ -69,6 +116,37 @@ export default async function TopicPage({
   return (
     <main className="min-h-screen px-6 py-24">
       <div className="mx-auto max-w-4xl">
+        <Breadcrumbs
+          items={[
+            { label: 'Bookmarks', href: '/bookmarks' },
+            {
+              label: topicBookmarks[0].topic,
+              href: `/bookmarks/${encodeURIComponent(topicBookmarks[0].topic)}`,
+            },
+          ]}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: getJsonLd({
+              '@context': 'https://schema.org',
+              '@type': 'CollectionPage',
+              name: `${topicBookmarks[0].topic} Bookmarks`,
+              url: absoluteUrl(`/bookmarks/${encodeURIComponent(topicBookmarks[0].topic)}`),
+              hasPart: topicBookmarks.map((bookmark) => ({
+                '@type': bookmark.isPdf ? 'DigitalDocument' : 'WebPage',
+                name: bookmark.title,
+                description: bookmark.description,
+                url: bookmark.url,
+                isPartOf: {
+                  '@type': 'WebSite',
+                  name: getSourceName(bookmark.url),
+                  url: getSourceOrigin(bookmark.url),
+                },
+              })),
+            }),
+          }}
+        />
 
         <Link
           href="/bookmarks"
@@ -148,6 +226,10 @@ export default async function TopicPage({
                       {bookmark.description}
                     </p>
                   )}
+
+                  <p className="mt-4 text-xs uppercase tracking-widest opacity-60">
+                    Source: {getSourceName(bookmark.url)}
+                  </p>
 
                 </div>
 

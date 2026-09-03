@@ -1,13 +1,19 @@
 import type { Metadata } from 'next'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import ProjectPreview from '@/components/ProjectPreview'
 import { getProjects } from '@/lib/sanity.queries'
+import { absoluteUrl, getJsonLd } from '@/lib/site'
 import { getProjectPreview } from '@/lib/utils'
 import { sampleProjects } from '@/lib/sample-data'
 import type { Project } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'A showcase of my previous, current, and future projects.',
+  title: 'Software Engineering Projects',
+  description:
+    'Selected software engineering projects by Michael Paul, including backend systems, dashboards, APIs, cloud tools, and product experiments.',
+  alternates: {
+    canonical: '/projects',
+  },
 }
 
 export default async function ProjectsPage() {
@@ -31,7 +37,28 @@ export default async function ProjectsPage() {
 
   return (
     <main className="max-w-7xl mx-auto px-8 py-20">
-      <h1 className="text-5xl font-black mb-5">Projects</h1>
+      <Breadcrumbs items={[{ label: 'Projects', href: '/projects' }]} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: getJsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Software Engineering Projects',
+            url: absoluteUrl('/projects'),
+            hasPart: projects.map((project) => ({
+              '@type': 'CreativeWork',
+              name: project.title,
+              description: project.description,
+              url: project.liveUrl ?? project.githubUrl ?? absoluteUrl('/projects'),
+              datePublished: project.publishedAt,
+              programmingLanguage: project.techStack,
+            })),
+          }),
+        }}
+      />
+
+      <h1 className="text-5xl font-black mb-5">Software Engineering Projects</h1>
       <p className="mb-20 opacity-70">
         A showcase of my previous, current, and future projects.
       </p>
@@ -90,7 +117,7 @@ export default async function ProjectsPage() {
           ))
         ) : (
           <div className="col-span-full text-center py-16 border border-dashed rounded-xl" style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
-            No projects found. Add some in Sanity!
+            Selected projects will appear here soon.
           </div>
         )}
       </div>
