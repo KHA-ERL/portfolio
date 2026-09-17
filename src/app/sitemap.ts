@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { getBookmarks, getPosts, getProjects } from '@/lib/sanity.queries'
-import { sampleBookmarks, samplePosts, sampleProjects } from '@/lib/sample-data'
+import { getBookmarks, getPosts } from '@/lib/sanity.queries'
+import { sampleBookmarks, samplePosts } from '@/lib/sample-data'
 import { absoluteUrl } from '@/lib/site'
 
 async function getPublishedPosts() {
@@ -14,19 +14,6 @@ async function getPublishedPosts() {
   }
 
   return samplePosts
-}
-
-async function getPublishedProjects() {
-  try {
-    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
-      const projects = await getProjects()
-      if (projects.length > 0) return projects
-    }
-  } catch {
-    return sampleProjects
-  }
-
-  return sampleProjects
 }
 
 async function getBookmarkTopics() {
@@ -45,9 +32,8 @@ async function getBookmarkTopics() {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, projects, bookmarkTopics] = await Promise.all([
+  const [posts, bookmarkTopics] = await Promise.all([
     getPublishedPosts(),
-    getPublishedProjects(),
     getBookmarkTopics(),
   ])
 
@@ -75,6 +61,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: absoluteUrl('/answers'),
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      images: [absoluteUrl('/aboutme.jpg')],
+    },
+    {
       url: absoluteUrl('/blog'),
       lastModified: now,
       changeFrequency: 'weekly',
@@ -86,20 +79,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
+    {
+      url: absoluteUrl('/ai-summary.json'),
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.4,
+    },
     ...posts.map((post) => ({
       url: absoluteUrl(`/blog/${post.slug.current}`),
       lastModified: new Date(post.publishedAt),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
-    ...projects
-      .filter((project) => project.liveUrl || project.githubUrl)
-      .map((project) => ({
-        url: project.liveUrl ?? project.githubUrl ?? absoluteUrl('/projects'),
-        lastModified: new Date(project.publishedAt),
-        changeFrequency: 'monthly' as const,
-        priority: 0.5,
-      })),
     ...bookmarkTopics.map((topic) => ({
       url: absoluteUrl(`/bookmarks/${encodeURIComponent(topic)}`),
       lastModified: now,

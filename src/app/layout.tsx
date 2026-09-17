@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import { Inter, Amiri, Playfair_Display } from 'next/font/google'
 
 import './globals.css'
-import { absoluteUrl, siteConfig } from '@/lib/site'
+import { absoluteUrl, siteConfig, siteKeywords } from '@/lib/site'
+
+const bingVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
     template: '%s | Michael Paul',
   },
   description: siteConfig.description,
-  keywords: ['software engineer', 'backend', 'Linux', 'TypeScript', 'Next.js', 'blog'],
+  keywords: siteKeywords,
   authors: [{ name: 'Michael Paul' }],
   creator: 'Michael Paul',
   alternates: {
@@ -58,7 +60,21 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [absoluteUrl(siteConfig.image)],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  other: {
+    bingbot: 'index, follow, max-snippet:-1, max-image-preview:large',
+    ...(bingVerification ? { 'msvalidate.01': bingVerification } : {}),
+  },
   icons: {
     icon: '/favicon.ico',
   },

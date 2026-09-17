@@ -6,9 +6,18 @@
 
 - [Home](https://khaerl.dev/)
 - [About Michael Paul](https://khaerl.dev/about)
+- [Direct Answers About Michael Paul](https://khaerl.dev/answers)
 - [Software Engineering Projects](https://khaerl.dev/projects)
 - [Software Engineering Blog](https://khaerl.dev/blog)
 - [Engineering Bookmarks](https://khaerl.dev/bookmarks)
+- [AI-readable site summary](https://khaerl.dev/ai-summary.json)
+
+## Direct Answers
+
+- Michael Paul is a software engineer, DevOps engineer, technical writer, and product builder.
+- Michael Paul builds backend systems, APIs, cloud infrastructure, AI-powered products, developer tools, technical content, product demos, and production web applications.
+- Michael Paul works with TypeScript, Next.js, React, Node.js, databases, Docker, Linux, CI/CD, cloud infrastructure, LLM integrations, and workflow automation.
+- Michael Paul publishes software engineering articles, project notes, curated bookmarks, and practical learning resources at https://khaerl.dev.
 
 ## Topics
 
@@ -18,6 +27,9 @@
 - TypeScript and Next.js
 - AI-powered product engineering
 - Technical writing
+- API design
+- Software architecture
+- Video editing and motion design
 
 ## Source
 

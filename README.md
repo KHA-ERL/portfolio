@@ -43,6 +43,21 @@ NEXT_PUBLIC_SANITY_DATASET="production"
 NEXT_PUBLIC_SANITY_API_VERSION="2024-01-01"
 # Optional: for preview drafts
 SANITY_API_READ_TOKEN="your_read_token"
+
+# Optional: Bing Webmaster Tools verification meta value
+NEXT_PUBLIC_BING_SITE_VERIFICATION="your_bing_verification_code"
+
+# Optional: IndexNow support for faster Bing/Copilot discovery
+INDEXNOW_KEY="your_indexnow_key"
+INDEXNOW_SUBMIT_SECRET="a_private_bearer_token_for_submissions"
+```
+
+When `INDEXNOW_KEY` is set, the key is served at `/indexnow-key.txt`.
+Submit changed URLs by posting to `/api/indexnow` with
+`Authorization: Bearer $INDEXNOW_SUBMIT_SECRET` and a JSON body:
+
+```json
+{ "urls": ["https://khaerl.dev/blog/example"] }
 ```
 
 ### 3. Run the Development Server

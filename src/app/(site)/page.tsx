@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProjectPreview from '@/components/ProjectPreview'
-import { getJsonLd, localBusinessJsonLd, personJsonLd, siteConfig } from '@/lib/site'
+import { getJsonLd, localBusinessJsonLd, personJsonLd, siteConfig, websiteJsonLd } from '@/lib/site'
 import { formatDate, getProjectPreview } from '@/lib/utils'
 import { getLatestPosts, getFeaturedBookmarks, getFeaturedProjects } from '@/lib/sanity.queries'
 import { samplePosts, sampleBookmarks, sampleProjects } from '@/lib/sample-data'
@@ -53,6 +53,10 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: getJsonLd(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: getJsonLd(websiteJsonLd) }}
       />
       <script
         type="application/ld+json"

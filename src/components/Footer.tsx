@@ -22,6 +22,8 @@ export function Footer() {
         {/* Links */}
         <nav className="flex items-center gap-5" aria-label="Footer navigation">
           {[
+            { href: '/answers', label: 'Answers' },
+            { href: '/ai-summary.json', label: 'AI Summary' },
             { href: 'https://github.com/kha-erl', label: 'Github' },
             { href: 'https://x.com/kha_erl', label: 'Twitter' },
             { href: 'https://linkedin.com/in/khaerl', label: 'Linkedin' },

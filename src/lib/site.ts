@@ -13,6 +13,21 @@ export const siteConfig = {
   },
 }
 
+export const siteKeywords = [
+  'Michael Paul',
+  'software engineer',
+  'backend engineer',
+  'DevOps engineer',
+  'technical writer',
+  'AI product engineer',
+  'cloud infrastructure',
+  'Linux',
+  'TypeScript',
+  'Next.js',
+  'API design',
+  'software architecture',
+]
+
 export function absoluteUrl(path = '/') {
   return new URL(path, siteConfig.url).toString()
 }
@@ -41,10 +56,13 @@ export function getBreadcrumbJsonLd(items: Array<{ name: string; path: string }>
 export const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': absoluteUrl('/about#person'),
   name: siteConfig.name,
+  alternateName: 'kha-erl',
   url: siteConfig.url,
   image: absoluteUrl('/aboutme.jpg'),
   jobTitle: 'Software Engineer',
+  description: siteConfig.description,
   sameAs: [
     siteConfig.social.github,
     siteConfig.social.linkedin,
@@ -57,7 +75,27 @@ export const personJsonLd = {
     'Cloud architecture',
     'Technical writing',
     'AI-powered product engineering',
+    'API design',
+    'TypeScript',
+    'Next.js',
+    'Video editing',
   ],
+}
+
+export const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': absoluteUrl('/#website'),
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  publisher: {
+    '@id': absoluteUrl('/about#person'),
+  },
+  inLanguage: 'en',
+  about: {
+    '@id': absoluteUrl('/about#person'),
+  },
 }
 
 export const localBusinessJsonLd = {
@@ -85,5 +123,34 @@ export const localBusinessJsonLd = {
     siteConfig.social.github,
     siteConfig.social.linkedin,
     siteConfig.social.twitter,
+  ],
+  makesOffer: [
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'Backend and full stack software engineering',
+        description:
+          'Production web applications, APIs, databases, dashboards, and maintainable product systems.',
+      },
+    },
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'DevOps and cloud infrastructure engineering',
+        description:
+          'Deployment pipelines, Linux servers, Docker workflows, CI/CD, monitoring, and cloud infrastructure.',
+      },
+    },
+    {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: 'AI-powered product engineering',
+        description:
+          'LLM integrations, AI agents, workflow automation, and AI-assisted product features.',
+      },
+    },
   ],
 }

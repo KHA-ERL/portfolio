@@ -3,11 +3,18 @@ import { absoluteUrl, siteConfig } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/studio/'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/studio/', '/api/'],
+      },
+      {
+        userAgent: 'Bingbot',
+        allow: '/',
+        disallow: ['/studio/', '/api/'],
+      },
+    ],
     sitemap: absoluteUrl('/sitemap.xml'),
     host: siteConfig.url,
   }
